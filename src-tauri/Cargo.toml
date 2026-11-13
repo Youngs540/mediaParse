@@ -1,0 +1,17 @@
+[package]
+name = "mediaparse-desktop"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+default = []
+custom-protocol = ["tauri/custom-protocol"]
+
+[dependencies]
+mediaparse-app = { path = "../crates/app", features = ["desktop"] }
+tauri = { workspace = true }
+tauri-plugin-dialog = { workspace = true }
+
+[build-dependencies]
+tauri-build = { workspace = true }

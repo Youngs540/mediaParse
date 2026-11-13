@@ -1,0 +1,27 @@
+{
+  "name": "mediaparse",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Rename movie and TV episode files for Jellyfin detection",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.12.4",
+    "@tauri-apps/plugin-dialog": "^2.8.4"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "@tauri-apps/cli": "^2.12.4",
+    "svelte": "^5.57.3",
+    "svelte-check": "^4.3.4",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.6"
+  }
+}

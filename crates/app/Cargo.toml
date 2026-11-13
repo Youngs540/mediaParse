@@ -1,0 +1,26 @@
+[package]
+name = "mediaparse-app"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+default = ["desktop"]
+desktop = ["dep:tauri", "dep:tauri-plugin-dialog"]
+
+[dependencies]
+mediaparse-core = { path = "../core" }
+mediaparse-infra = { path = "../infra" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+rayon = { workspace = true }
+async-trait = { workspace = true }
+futures = { workspace = true }
+tracing = { workspace = true }
+tauri = { workspace = true, optional = true }
+tauri-plugin-dialog = { workspace = true, optional = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

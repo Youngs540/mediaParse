@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Jellyfin Movie Renamer</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+.row{display:grid;grid-template-columns:28px 112px 1fr 1fr 56px;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid #e8dcef;font-size:13px;color:#2a1733}
+.row.sel{background:#e3e9fd;box-shadow:inset 3px 0 0 #6482ec}
+.old{color:#6b5877;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.new{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:500;border:1px solid}
+.ok{color:#1b7a45;border-color:#8fcfa9}.rev{color:#8a5a00;border-color:#e0b86a}.bad{color:#b3261e;border-color:#e8a3a0}
+.nav{display:flex;justify-content:space-between;padding:8px 12px;border-radius:8px;font-size:13px;color:#2a1733;border:0;background:none;width:100%;font-family:inherit}
+.nav.on{background:#e3e9fd;box-shadow:inset 3px 0 0 #6482ec}
+.btn{font-family:inherit;font-size:13px;font-weight:500;padding:9px 16px;min-height:44px;border-radius:8px;border:1px solid #6482ec;background:#e9eefd;color:#243283}
+.pri{background:#4f6de0;border-color:#4f6de0;color:#ffffff;font-weight:600}
+.cand{padding:12px;border:1px solid #e8dcef;border-radius:10px;font-size:13px;color:#2a1733;display:flex;justify-content:space-between;gap:8px}
+.cand.top{border-color:#6482ec}
+.lbl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6b5877;margin:0 0 8px}
+</style>
+</helmet>
+<div style="min-height:800px;display:flex;flex-direction:column;background:#ffffff;font-family:Inter,system-ui,sans-serif;color:#2a1733">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid #e8dcef;background:#ffffff">
+<div style="display:flex;align-items:center;gap:16px"><strong style="font-size:15px">Movie Renamer</strong><span style="font-size:13px;color:#6b5877">/media/movies · 128 files</span></div>
+<div style="display:flex;gap:8px"><button class="btn">Choose folder</button><button class="btn">Rescan</button><button class="btn">Settings</button></div>
+</div>
+<div style="display:flex;flex:1;flex-wrap:wrap">
+<div style="width:220px;flex:none;padding:16px;border-right:1px solid #e8dcef;display:flex;flex-direction:column;gap:4px;box-sizing:border-box">
+<p class="lbl">Filter</p>
+<button class="nav on"><span>All</span><span>128</span></button>
+<button class="nav"><span>Matched</span><span>104</span></button>
+<button class="nav"><span>Needs review</span><span>17</span></button>
+<button class="nav"><span>Unmatched</span><span>7</span></button>
+<button class="nav"><span>Conflicts</span><span>2</span></button>
+<p class="lbl" style="margin-top:20px">Template</p>
+<label for="tpl" style="font-size:12px;color:#6b5877">Folder and file name</label>
+<input id="tpl" value="{title} ({year}) [tmdbid-{id}]" style="margin-top:6px;padding:10px;border-radius:8px;border:1px solid #cbb4d8;background:#ffffff;color:#2a1733;font-size:13px;font-family:inherit">
+<p class="lbl" style="margin-top:20px">Options</p>
+<label style="font-size:13px;display:flex;gap:8px;align-items:center;min-height:32px"><input type="checkbox" checked="">Create movie folders</label>
+<label style="font-size:13px;display:flex;gap:8px;align-items:center;min-height:32px"><input type="checkbox" checked="">Move sidecar files</label>
+<label style="font-size:13px;display:flex;gap:8px;align-items:center;min-height:32px"><input type="checkbox">Offline (cache only)</label>
+</div>
+<div style="flex:1;min-width:480px;display:flex;flex-direction:column">
+<div style="padding:12px 16px;border-bottom:1px solid #e8dcef;display:flex;gap:12px;align-items:center">
+<label for="q" style="font-size:12px;color:#6b5877">Search</label>
+<input id="q" placeholder="Filter by name" style="flex:1;padding:10px;border-radius:8px;border:1px solid #4f6de0;background:#ffffff;color:#2a1733;font-size:13px;font-family:inherit">
+</div>
+<div class="row" style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6b5877"><span></span><span>Status</span><span>Original</span><span>New name</span><span>Score</span></div>
+<div class="row"><input type="checkbox" checked="" aria-label="Select"><span><span class="chip ok">Matched</span></span><span class="old">The.Matrix.1999.1080p.BluRay.x264-YTS.mkv</span><span class="new">The Matrix (1999) [tmdbid-603]/The Matrix (1999) [tmdbid-603].mkv</span><span>98%</span></div>
+<div class="row"><input type="checkbox" checked="" aria-label="Select"><span><span class="chip ok">Matched</span></span><span class="old">inception_2010_720p_web-dl.mp4</span><span class="new">Inception (2010) [tmdbid-27205]/Inception (2010) [tmdbid-27205].mp4</span><span>96%</span></div>
+<div class="row sel"><input type="checkbox" aria-label="Select"><span><span class="chip rev">Review</span></span><span class="old">Avatar.2009.EXTENDED.2160p.HDR.REMUX.mkv</span><span class="new">Avatar (2009) [tmdbid-19995] - Extended.mkv</span><span>74%</span></div>
+<div class="row"><input type="checkbox" aria-label="Select"><span><span class="chip rev">Review</span></span><span class="old">Dune 2021 CD1.avi</span><span class="new">Dune (2021) [tmdbid-438631] - part1.avi</span><span>71%</span></div>
+<div class="row"><input type="checkbox" checked="" aria-label="Select"><span><span class="chip ok">Matched</span></span><span class="old">Parasite.2019.KOREAN.1080p.BluRay.mkv</span><span class="new">Parasite (2019) [tmdbid-496243]/Parasite (2019) [tmdbid-496243].mkv</span><span>97%</span></div>
+<div class="row"><input type="checkbox" aria-label="Select"><span><span class="chip bad">Conflict</span></span><span class="old">Heat.1995.1080p.mkv</span><span class="new">Heat (1995) [tmdbid-949].mkv already exists</span><span>95%</span></div>
+<div class="row"><input type="checkbox" aria-label="Select"><span><span class="chip bad">Unmatched</span></span><span class="old">holiday_video_final_v2.mp4</span><span class="new" style="color:#6b5877">No match found</span><span>–</span></div>
+</div>
+<div style="width:300px;flex:none;padding:16px;border-left:1px solid #e8dcef;box-sizing:border-box;display:flex;flex-direction:column;gap:10px">
+<p class="lbl">Selected file</p>
+<div style="font-size:13px;color:#6b5877;word-break:break-all">Avatar.2009.EXTENDED.2160p.HDR.REMUX.mkv</div>
+<div style="font-size:13px">Parsed: Avatar · 2009 · 2160p · Extended</div>
+<p class="lbl" style="margin-top:8px">Candidates</p>
+<div class="cand top"><span>Avatar (2009)</span><span>74%</span></div>
+<div class="cand"><span>Avatar: The Way of Water (2022)</span><span>52%</span></div>
+<div class="cand"><span>Avatar (2011 series)</span><span>31%</span></div>
+<label for="tmdb" style="font-size:12px;color:#6b5877;margin-top:8px">Search TMDB manually</label>
+<input id="tmdb" value="Avatar" style="padding:10px;border-radius:8px;border:1px solid #cbb4d8;background:#ffffff;color:#2a1733;font-size:13px;font-family:inherit">
+<button class="btn pri">Use this match</button>
+<button class="btn">Skip file</button>
+</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid #e8dcef;background:#ffffff;flex-wrap:wrap;gap:8px">
+<span style="font-size:13px;color:#6b5877">3 selected · 104 ready · 17 to review · 2 conflicts · dry run, nothing changed yet</span>
+<div style="display:flex;gap:8px"><button class="btn">Undo last run</button><button class="btn pri">Apply 3 renames</button></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux (.deb / .AppImage)
+            platform: ubuntu-22.04
+            args: "--bundles deb,appimage"
+            rust_targets: ""
+          - name: macOS (universal .dmg)
+            platform: macos-latest
+            args: "--target universal-apple-darwin --bundles dmg"
+            rust_targets: "aarch64-apple-darwin,x86_64-apple-darwin"
+          - name: Windows (.msi / NSIS)
+            platform: windows-latest
+            args: "--bundles msi,nsis"
+            rust_targets: ""
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_targets }}
+
+      - name: Cache Rust build artifacts
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ". -> target"
+
+      - name: Install Linux system dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libfuse2
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build and publish release bundles
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: "mediaParse v__VERSION__"
+          releaseBody: |
+            Native installers for mediaParse v__VERSION__.
+
+            - Linux: `.deb` and `.AppImage`
+            - macOS: universal `.dmg`
+            - Windows: `.msi` and NSIS `.exe`
+
+            These builds are not code-signed. See the README for build and
+            verification instructions.
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}

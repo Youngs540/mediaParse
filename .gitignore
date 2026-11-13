@@ -1,0 +1,19 @@
+# Rust
+/target
+/src-tauri/target
+**/*.rs.bk
+
+# Frontend
+node_modules
+/dist
+
+# Local environment and editor files
+.env
+.env.*
+.DS_Store
+.idea
+.vscode
+*.swp
+
+# Tauri generated schemas
+/src-tauri/gen
